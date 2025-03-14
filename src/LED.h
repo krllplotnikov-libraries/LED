@@ -1,11 +1,23 @@
 #ifndef LED_H_
 #define LED_H_
 
-#define LED_INDICATIONS_MAX_SIZE 16
+#define LED_INDICATIONS_MAX_SIZE       16
 #define LED_INDICATION_INFINITE_REPEAT 255
 
 #include <stdio.h>
 #include <stdint.h>
+
+typedef enum LedIndications LedIndications_et;
+typedef enum LedState       LedState_et;
+typedef enum LedState       LedState_et;
+
+typedef struct LedIndication    LedIndication_st;
+typedef struct LedUserFunctions LedUserFunctions_st;
+typedef struct LED              LED_st;
+
+typedef void     (*LedIndicationIsOverCallback) (LED_st* led, LedIndications_et indication, uint8_t repeatCounter);
+typedef uint32_t (*LedGetTick)                  ();
+typedef void     (*LedSetState)                 (LED_st* led, LedState_et state);
 
 enum LedIndications{
 	LED_INDICATION_OFF,
@@ -21,28 +33,15 @@ enum LedState{
 	LED_STATE_ON
 };
 
-typedef enum LedIndications LedIndications_et;
-typedef enum LedState LedState_et;
-typedef enum LedState LedState_et;
-
-typedef struct LedIndication LedIndication_st;
-typedef struct LedUserFunctions LedUserFunctions_st;
-typedef struct LED LED_st;
-
-typedef void (*LedIndicationIsOverCallback)(LED_st* led, LedIndications_et indication, uint8_t repeatCounter);
-typedef uint32_t (*LedGetTick)();
-typedef void (*LedSetState)(LED_st* led, LedState_et state);
-
 struct LedIndication{
-	uint8_t states[LED_INDICATIONS_MAX_SIZE];
+	uint8_t  states[LED_INDICATIONS_MAX_SIZE];
 	uint32_t durations[LED_INDICATIONS_MAX_SIZE];
-	uint8_t size;
+	uint8_t  size;
 };
 
 struct LedUserFunctions{
 	LedSetState setState;
-	LedGetTick getTick;
-
+	LedGetTick  getTick;
 	LedIndicationIsOverCallback indicationIsOverCallback;
 };
 

@@ -2,9 +2,9 @@
 
 const LedIndication_st indicationOff = {{0},{1000},1};
 const LedIndication_st indicationOn = {{1},{1000},1};
-const LedIndication_st indicationSingleBlink = {{1,0},{75,1500},2};
-const LedIndication_st indicationDoubleBlink = {{1,0,1,0},{75,250,75,1500},4};
-const LedIndication_st indicationTripleBlink = {{1,0,1,0,1,0},{75,250,75,250,75,1500},6};
+const LedIndication_st indicationSingleBlink = {{0,1,0},{250,75,1250},3};
+const LedIndication_st indicationDoubleBlink = {{0,1,0,1,0},{250,75,250,75,1250},5};
+const LedIndication_st indicationTripleBlink = {{0,1,0,1,0,1,0},{250,75,250,75,250,75,1250},7};
 
 LedIndication_st indications[] = {
 	indicationOff,
@@ -22,6 +22,9 @@ void LED_Init(LED_st* led, LedUserFunctions_st* userFunctions){
 	led->currentIndication = LED_INDICATION_OFF;
 	led->customIndication = NULL;
 	
+	led->indicationRepeatCount = 1;
+	led->indicationRepeatCounter = 0;
+
 	led->indicationDescriptorCounter = 0;
 	led->currentTime = led->userFunctions.getTick();
 }
