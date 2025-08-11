@@ -56,7 +56,7 @@ void LED_Run(LED_st* led){
 		if(led->indicationRepeatCounter < led->indicationRepeatCount){
 			led->userFunctions.setState(led, indications[led->currentIndication].states[led->indicationDescriptorCounter]);
 			if(led->userFunctions.getTick() - led->currentTime > indications[led->currentIndication].durations[led->indicationDescriptorCounter]){
-				if(led->indicationDescriptorCounter < indications[led->currentIndication].size){
+				if(led->indicationDescriptorCounter < indications[led->currentIndication].size - 1){
 					led->currentTime = led->userFunctions.getTick();
 					led->indicationDescriptorCounter++;
 				}
@@ -75,7 +75,7 @@ void LED_Run(LED_st* led){
 		if(led->indicationRepeatCounter < led->indicationRepeatCount){
 			led->userFunctions.setState(led, led->customIndication->states[led->indicationDescriptorCounter]);
 			if(led->userFunctions.getTick() - led->currentTime > led->customIndication->durations[led->indicationDescriptorCounter]){
-				if(led->indicationDescriptorCounter < led->customIndication->size){
+				if(led->indicationDescriptorCounter < led->customIndication->size - 1){
 					led->currentTime = led->userFunctions.getTick();
 					led->indicationDescriptorCounter++;
 				}
