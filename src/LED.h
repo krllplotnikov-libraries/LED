@@ -7,19 +7,19 @@
 #include <stdio.h>
 #include <stdint.h>
 
-typedef enum LedIndications LedIndications_et;
-typedef enum LedState       LedState_et;
-typedef enum LedState       LedState_et;
+typedef enum LED_Indications LED_Indications_et;
+typedef enum LED_State       LED_State_et;
+typedef enum LED_State       LED_State_et;
 
-typedef struct LedIndication    LedIndication_st;
-typedef struct LedUserFunctions LedUserFunctions_st;
-typedef struct LED              LED_st;
+typedef struct LED_Indication LED_Indication_st;
+typedef struct LED_Descriptor LED_Descriptor_st;
+typedef struct LED            LED_st;
 
-typedef void     (*LedIndicationIsOverCallback) (LED_st* led, LedIndications_et indication, uint8_t repeatCounter);
-typedef uint32_t (*LedGetTick)                  ();
-typedef void     (*LedSetState)                 (LED_st* led, LedState_et state);
+typedef void     (*LED_IndicationIsOverCallback) (LED_st* _led, LED_Indications_et _indication, uint8_t _repeatCounter);
+typedef uint32_t (*LED_GetTick)                  ();
+typedef void     (*LED_SetState)                 (LED_st* _led, LED_State_et _state);
 
-enum LedIndications{
+enum LED_Indications{
 	LED_INDICATION_OFF,
 	LED_INDICATION_ON,
 	LED_INDICATION_SINGLE_BLINK,
@@ -28,27 +28,27 @@ enum LedIndications{
 	LED_INDICATION_CUSTOM
 };
 
-enum LedState{
+enum LED_State{
 	LED_STATE_OFF,
 	LED_STATE_ON
 };
 
-struct LedIndication{
+struct LED_Indication{
 	uint8_t  states[LED_INDICATIONS_MAX_SIZE];
 	uint32_t durations[LED_INDICATIONS_MAX_SIZE];
 	uint8_t  size;
 };
 
-struct LedUserFunctions{
-	LedSetState setState;
-	LedGetTick  getTick;
-	LedIndicationIsOverCallback indicationIsOverCallback;
+struct LED_Descriptor{
+	LED_SetState setState;
+	LED_GetTick  getTick;
+	LED_IndicationIsOverCallback indicationIsOverCallback;
 };
 
 struct LED{
-	LedUserFunctions_st userFunctions;
-	LedIndications_et currentIndication;
-	LedIndication_st* customIndication;
+	LED_Descriptor_st descriptor;
+	LED_Indications_et currentIndication;
+	LED_Indication_st* customIndication;
 	uint8_t indicationRepeatCount;
 	uint8_t indicationRepeatCounter;
 	uint8_t indicationDescriptorCounter;
@@ -59,14 +59,14 @@ struct LED{
 extern "C" {
 #endif
 
-void LED_Init(LED_st* led, LedUserFunctions_st* userFunctions);
-void LED_Run(LED_st* led);
+void LED_Init(LED_st* _led, LED_Descriptor_st* _descriptor);
+void LED_Run(LED_st* _led);
 
-void LED_SetIndication(LED_st* led, LedIndications_et indication, uint8_t repeatCount);
-void LED_SetCustomIndication(LED_st* led, LedIndication_st* descriptor, uint8_t repeatCount);
+void LED_SetIndication(LED_st* _led, LED_Indications_et _indication, uint8_t _repeatCount);
+void LED_SetCustomIndication(LED_st* _led, LED_Indication_st* _descriptor, uint8_t _repeatCount);
 
-LedIndications_et LED_GetIndication(LED_st* led);
-LedIndication_st* LED_GetIndicationDescriptor(LED_st* led);
+LED_Indications_et LED_GetIndication(LED_st* _led);
+LED_Indication_st* LED_GetIndicationDescriptor(LED_st* _led);
 
 #ifdef __cplusplus
 }

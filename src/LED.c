@@ -1,12 +1,12 @@
 #include "LED.h"
 
-const LedIndication_st indicationOff = {{0},{1000},1};
-const LedIndication_st indicationOn = {{1},{1000},1};
-const LedIndication_st indicationSingleBlink = {{0,1,0},{250,75,1250},3};
-const LedIndication_st indicationDoubleBlink = {{0,1,0,1,0},{250,75,250,75,1250},5};
-const LedIndication_st indicationTripleBlink = {{0,1,0,1,0,1,0},{250,75,250,75,250,75,1250},7};
+const LED_Indication_st indicationOff = {{0},{1000},1};
+const LED_Indication_st indicationOn = {{1},{1000},1};
+const LED_Indication_st indicationSingleBlink = {{0,1,0},{250,75,1250},3};
+const LED_Indication_st indicationDoubleBlink = {{0,1,0,1,0},{250,75,250,75,1250},5};
+const LED_Indication_st indicationTripleBlink = {{0,1,0,1,0,1,0},{250,75,250,75,250,75,1250},7};
 
-LedIndication_st indications[] = {
+LED_Indication_st indications[] = {
 	indicationOff,
 	indicationOn,
 	indicationSingleBlink,
@@ -14,78 +14,78 @@ LedIndication_st indications[] = {
 	indicationTripleBlink
 };
 
-void LED_Init(LED_st* led, LedUserFunctions_st* userFunctions){
-	led->userFunctions.setState = userFunctions->setState;
-	led->userFunctions.getTick = userFunctions->getTick;
-	led->userFunctions.indicationIsOverCallback = userFunctions->indicationIsOverCallback;
+void LED_Init(LED_st* _led, LED_Descriptor_st* _descriptor){
+	_led->descriptor.setState = _descriptor->setState;
+	_led->descriptor.getTick = _descriptor->getTick;
+	_led->descriptor.indicationIsOverCallback = _descriptor->indicationIsOverCallback;
 
-	led->currentIndication = LED_INDICATION_OFF;
-	led->customIndication = NULL;
+	_led->currentIndication = LED_INDICATION_OFF;
+	_led->customIndication = NULL;
 	
-	led->indicationRepeatCount = 1;
-	led->indicationRepeatCounter = 0;
+	_led->indicationRepeatCount = 1;
+	_led->indicationRepeatCounter = 0;
 
-	led->indicationDescriptorCounter = 0;
-	led->currentTime = led->userFunctions.getTick();
+	_led->indicationDescriptorCounter = 0;
+	_led->currentTime = _led->descriptor.getTick();
 }
 
-void LED_SetIndication(LED_st* led, LedIndications_et indication, uint8_t repeatCount){
-	led->customIndication = NULL;
-	led->currentIndication = indication;
-	led->indicationRepeatCount = repeatCount;
-	led->indicationRepeatCounter = 0;
-	led->indicationDescriptorCounter = 0;
-	led->currentTime = led->userFunctions.getTick();
+void LED_SetIndication(LED_st* _led, LED_Indications_et _indication, uint8_t _repeatCount){
+	_led->customIndication = NULL;
+	_led->currentIndication = _indication;
+	_led->indicationRepeatCount = _repeatCount;
+	_led->indicationRepeatCounter = 0;
+	_led->indicationDescriptorCounter = 0;
+	_led->currentTime = _led->descriptor.getTick();
 }
 
-void LED_SetCustomIndication(LED_st* led, LedIndication_st* descriptor, uint8_t repeatCount){
-	led->customIndication = descriptor;
-	led->currentIndication = LED_INDICATION_CUSTOM;
-	led->indicationRepeatCount = repeatCount;
-	led->indicationRepeatCounter = 0;
-	led->indicationDescriptorCounter = 0;
-	led->currentTime = led->userFunctions.getTick();
+void LED_SetCustomIndication(LED_st* _led, LED_Indication_st* _customIndication, uint8_t _repeatCount){
+	_led->customIndication = _customIndication;
+	_led->currentIndication = LED_INDICATION_CUSTOM;
+	_led->indicationRepeatCount = _repeatCount;
+	_led->indicationRepeatCounter = 0;
+	_led->indicationDescriptorCounter = 0;
+	_led->currentTime = _led->descriptor.getTick();
 }
 
-LedIndications_et LED_GetIndication(LED_st* led){
-	return led->currentIndication;
+LED_Indications_et LED_GetIndication(LED_st* _led){
+	return _led->currentIndication;
 }
 
-void LED_Run(LED_st* led){
-	if(led->customIndication == NULL){
-		if(led->indicationRepeatCounter < led->indicationRepeatCount){
-			led->userFunctions.setState(led, indications[led->currentIndication].states[led->indicationDescriptorCounter]);
-			if(led->userFunctions.getTick() - led->currentTime > indications[led->currentIndication].durations[led->indicationDescriptorCounter]){
-				if(led->indicationDescriptorCounter < indications[led->currentIndication].size - 1){
-					led->currentTime = led->userFunctions.getTick();
-					led->indicationDescriptorCounter++;
+void LED_Run(LED_st* _led){
+	if(_led->customIndication == NULL){
+		if(_led->indicationRepeatCounter < _led->indicationRepeatCount){
+			_led->descriptor.setState(_led, indications[_led->currentIndication].states[_led->indicationDescriptorCounter]);
+			if(_led->descriptor.getTick() - _led->currentTime > indications[_led->currentIndication].durations[_led->indicationDescriptorCounter]){
+				if(_led->indicationDescriptorCounter < indications[_led->currentIndication].size - 1){
+					_led->currentTime = _led->descriptor.getTick();
+					_led->indicationDescriptorCounter++;
 				}
 				else{
-					led->indicationDescriptorCounter = 0;
-					if(led->indicationRepeatCount != 255)
-						led->indicationRepeatCounter++;
+					_led->indicationDescriptorCounter = 0;
+					if(_led->indicationRepeatCount != 255)
+						_led->indicationRepeatCounter++;
 
-					if(led->userFunctions.indicationIsOverCallback != NULL)
-						led->userFunctions.indicationIsOverCallback(led, led->currentIndication, led->indicationRepeatCounter);
+					if(_led->descriptor.indicationIsOverCallback != NULL)
+						_led->descriptor.indicationIsOverCallback(_led, _led->currentIndication, _led->indicationRepeatCounter);
 				}
 			}
 		}
 	}
 	else{
-		if(led->indicationRepeatCounter < led->indicationRepeatCount){
-			led->userFunctions.setState(led, led->customIndication->states[led->indicationDescriptorCounter]);
-			if(led->userFunctions.getTick() - led->currentTime > led->customIndication->durations[led->indicationDescriptorCounter]){
-				if(led->indicationDescriptorCounter < led->customIndication->size - 1){
-					led->currentTime = led->userFunctions.getTick();
-					led->indicationDescriptorCounter++;
+		if(_led->indicationRepeatCounter < _led->indicationRepeatCount){
+			_led->descriptor.setState(_led, _led->customIndication->states[_led->indicationDescriptorCounter]);
+			if(_led->descriptor.getTick() - _led->currentTime > _led->customIndication->durations[_led->indicationDescriptorCounter]){
+				if(_led->indicationDescriptorCounter < _led->customIndication->size - 1){
+					_led->currentTime = _led->descriptor.getTick();
+					_led->indicationDescriptorCounter++;
 				}
 				else{
-					led->indicationDescriptorCounter = 0;
-					if(led->indicationRepeatCount != 255)
-						led->indicationRepeatCounter++;
+					_led->indicationDescriptorCounter = 0;
+					if(_led->indicationRepeatCount != 255)
+						_led->indicationRepeatCounter++;
 
-					if(led->userFunctions.indicationIsOverCallback != NULL)
-						led->userFunctions.indicationIsOverCallback(led, led->currentIndication, led->indicationRepeatCounter);
+					if(_led->descriptor.indicationIsOverCallback != NULL)
+						_led->descriptor.indicationIsOverCallback(_led, _led->currentIndication, _led->indicationRepeatCounter);
 				}
 			}
 		}
