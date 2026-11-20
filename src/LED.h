@@ -43,6 +43,7 @@ struct LED_Descriptor{
 	LED_SetState setState;
 	LED_GetTick  getTick;
 	LED_IndicationIsOverCallback indicationIsOverCallback;
+	void* context;
 };
 
 struct LED{
